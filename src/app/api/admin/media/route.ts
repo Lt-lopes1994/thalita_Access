@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
+import { mkdir } from "fs/promises";
 import { join } from "path";
 import { verifyAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const uploadDir = join(process.cwd(), "public", "uploads");
     try {
       await mkdir(uploadDir, { recursive: true });
-    } catch (error) {
+    } catch {
       // Diretório já existe
     }
 

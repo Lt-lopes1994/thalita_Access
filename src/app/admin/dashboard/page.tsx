@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { ToastContainer, useToast } from "@/components/Toast";
 
 interface User {
@@ -24,8 +25,20 @@ interface MediaFile {
   filename: string;
   originalName: string;
   mimetype: string;
+  mimeType?: string;
   size: number;
   url: string;
+  path?: string;
+  createdAt: string;
+}
+
+interface ApiMediaFile {
+  id: string;
+  filename: string;
+  originalName: string;
+  mimeType: string;
+  size: number;
+  path: string;
   createdAt: string;
 }
 
@@ -47,6 +60,7 @@ export default function AdminDashboard() {
     checkAuth();
     loadContent();
     loadMediaFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = async () => {
@@ -110,15 +124,17 @@ export default function AdminDashboard() {
       if (response.ok) {
         const data = await response.json();
         // Transformar os dados para o formato esperado
-        const transformedFiles = (data.media || []).map((file: any) => ({
-          id: file.id,
-          filename: file.filename,
-          originalName: file.originalName,
-          mimetype: file.mimeType || "image/jpeg",
-          size: file.size || 0,
-          url: file.path,
-          createdAt: file.createdAt,
-        }));
+        const transformedFiles = (data.media || []).map(
+          (file: ApiMediaFile) => ({
+            id: file.id,
+            filename: file.filename,
+            originalName: file.originalName,
+            mimetype: file.mimeType || "image/jpeg",
+            size: file.size || 0,
+            url: file.path,
+            createdAt: file.createdAt,
+          })
+        );
         setMediaFiles(transformedFiles);
       }
     } catch (error) {
@@ -410,9 +426,11 @@ export default function AdminDashboard() {
                     >
                       <div className="aspect-square bg-gray-100 flex items-center justify-center">
                         {file.mimetype.startsWith("image/") ? (
-                          <img
+                          <Image
                             src={file.url}
                             alt={file.originalName}
+                            width={200}
+                            height={200}
                             className="w-full h-full object-cover"
                           />
                         ) : (

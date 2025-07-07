@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { ToastContainer, useToast } from "@/components/Toast";
 
 interface User {
@@ -24,8 +25,20 @@ interface MediaFile {
   filename: string;
   originalName: string;
   mimetype: string;
+  mimeType?: string;
   size: number;
   url: string;
+  path?: string;
+  createdAt: string;
+}
+
+interface ApiMediaFile {
+  id: string;
+  filename: string;
+  originalName: string;
+  mimeType: string;
+  size: number;
+  path: string;
   createdAt: string;
 }
 
@@ -80,6 +93,7 @@ export default function AdminDashboardPreview() {
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content]);
 
   const refreshPreview = () => {
@@ -148,15 +162,17 @@ export default function AdminDashboardPreview() {
 
       if (response.ok) {
         const data = await response.json();
-        const transformedFiles = (data.media || []).map((file: any) => ({
-          id: file.id,
-          filename: file.filename,
-          originalName: file.originalName,
-          mimetype: file.mimeType || "image/jpeg",
-          size: file.size || 0,
-          url: file.path,
-          createdAt: file.createdAt,
-        }));
+        const transformedFiles = (data.media || []).map(
+          (file: ApiMediaFile) => ({
+            id: file.id,
+            filename: file.filename,
+            originalName: file.originalName,
+            mimetype: file.mimeType || "image/jpeg",
+            size: file.size || 0,
+            url: file.path,
+            createdAt: file.createdAt,
+          })
+        );
         setMediaFiles(transformedFiles);
       }
     } catch (error) {
@@ -260,9 +276,16 @@ export default function AdminDashboardPreview() {
                 <span className="text-white font-bold text-lg">T</span>
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">
-                  Painel Administrativo
-                </h1>
+                <div className="flex items-center space-x-2">
+                  <h1 className="text-xl font-semibold text-gray-900">
+                    Painel Administrativo
+                  </h1>
+                  {editingContent && (
+                    <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
+                      ✏️ Editando
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-gray-500">Thalita Terapias</p>
               </div>
             </div>
@@ -284,7 +307,11 @@ export default function AdminDashboardPreview() {
               {showPreview && (
                 <select
                   value={previewDevice}
-                  onChange={(e) => setPreviewDevice(e.target.value as any)}
+                  onChange={(e) =>
+                    setPreviewDevice(
+                      e.target.value as "desktop" | "tablet" | "mobile"
+                    )
+                  }
                   className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
                 >
                   <option value="desktop">🖥️ Desktop</option>
@@ -294,11 +321,19 @@ export default function AdminDashboardPreview() {
               )}
 
               <span className="text-sm text-gray-600">Olá, {user?.name}</span>
+              
+              <a 
+                href="/admin/dashboard"
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+              >
+                🏠 Dashboard
+              </a>
+              
               <button
                 onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
               >
-                Sair
+                🚪 Sair
               </button>
             </div>
           </div>
@@ -306,7 +341,9 @@ export default function AdminDashboardPreview() {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className={`flex-1 flex overflow-hidden transition-all duration-300 ${
+        editingContent ? 'ml-96' : 'ml-0'
+      }`}>
         {/* Admin Panel */}
         <div
           className={`${
@@ -487,9 +524,11 @@ export default function AdminDashboardPreview() {
                       >
                         <div className="aspect-square bg-gray-100 flex items-center justify-center">
                           {file.mimetype.startsWith("image/") ? (
-                            <img
+                            <Image
                               src={file.url}
                               alt={file.originalName}
+                              width={200}
+                              height={200}
                               className="w-full h-full object-cover"
                             />
                           ) : (
@@ -595,26 +634,35 @@ export default function AdminDashboardPreview() {
       </div>
 
       {/* Edit Content Modal */}
+      {/* Editor Lateral - não sobrepõe o preview */}
       {editingContent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">
-                {editingContent.id ? "✏️ Editar Conteúdo" : "➕ Novo Conteúdo"}
-              </h3>
+        <div className="fixed inset-y-0 left-0 w-96 bg-white shadow-2xl z-50 border-r border-gray-200">
+          <div className="flex flex-col h-full">
+            <div className="px-6 py-4 border-b border-gray-200 bg-purple-50">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-900">
+                  {editingContent.id ? "✏️ Editar Conteúdo" : "➕ Novo Conteúdo"}
+                </h3>
+                <button
+                  onClick={() => setEditingContent(null)}
+                  className="text-gray-400 hover:text-gray-600 text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSaveContent(editingContent);
-              }}
-              className="p-6 space-y-4"
-            >
-              <div className="grid grid-cols-2 gap-4">
+            <div className="flex-1 overflow-y-auto p-6">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSaveContent(editingContent);
+                }}
+                className="space-y-6"
+              >
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Seção
+                    📂 Seção
                   </label>
                   <input
                     type="text"
@@ -625,7 +673,7 @@ export default function AdminDashboardPreview() {
                         section: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                     placeholder="ex: hero, about, services"
                     required
                   />
@@ -633,7 +681,7 @@ export default function AdminDashboardPreview() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Campo
+                    🏷️ Campo
                   </label>
                   <input
                     type="text"
@@ -644,50 +692,60 @@ export default function AdminDashboardPreview() {
                         field: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                     placeholder="ex: title, description"
                     required
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Valor
-                </label>
-                <textarea
-                  value={editingContent.value}
-                  onChange={(e) =>
-                    setEditingContent({
-                      ...editingContent,
-                      value: e.target.value,
-                    })
-                  }
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                  placeholder="Conteúdo..."
-                  required
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    📝 Conteúdo
+                  </label>
+                  <textarea
+                    value={editingContent.value}
+                    onChange={(e) =>
+                      setEditingContent({
+                        ...editingContent,
+                        value: e.target.value,
+                      })
+                    }
+                    rows={10}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                    placeholder="Digite o conteúdo aqui..."
+                    required
+                  />
+                  <div className="text-xs text-gray-500 mt-1">
+                    {editingContent.value.length} caracteres
+                  </div>
+                </div>
 
-              <div className="flex justify-end space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setEditingContent(null)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-                >
-                  💾 Salvar
-                </button>
-              </div>
-            </form>
+                <div className="flex space-x-3 pt-4 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setEditingContent(null)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    ❌ Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                  >
+                    💾 Salvar
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Overlay sutil para indicar modo de edição */}
+      {editingContent && (
+        <div 
+          className="fixed inset-0 bg-purple-900 bg-opacity-5 z-40 pointer-events-none"
+        />
       )}
 
       {/* Toast Container */}

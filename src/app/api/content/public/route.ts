@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // GET - Obter conteúdo público (sem autenticação)
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const content = await prisma.siteContent.findMany({
       select: {
