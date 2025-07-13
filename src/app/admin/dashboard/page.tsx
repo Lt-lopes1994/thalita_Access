@@ -555,7 +555,7 @@ export default function AdminDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-black-700 mb-2">
                   Valor
                 </label>
                 <textarea

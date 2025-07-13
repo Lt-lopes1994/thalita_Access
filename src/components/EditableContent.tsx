@@ -41,13 +41,20 @@ export default function EditableContent({
   }
 
   return (
-    <div className={`relative group ${className}`} onClick={handleEdit}>
+    <div className={`relative group ${className}`}>
       {children}
 
-      {/* Overlay para indicar conteúdo editável */}
-      <div className="absolute inset-0 bg-purple-500 bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 cursor-pointer rounded">
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-purple-600 text-white text-xs px-2 py-1 rounded shadow-lg">
-          ✏️ {section}.{field}
+      {/* Indicador de conteúdo editável - sutil e não intrusivo */}
+      <div
+        className="absolute inset-0 border-2 border-dashed border-blue-400 border-opacity-0 group-hover:border-opacity-60 transition-all duration-300 cursor-pointer rounded-md pointer-events-none"
+        onClick={handleEdit}
+      >
+        {/* Badge de edição com alto contraste */}
+        <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-full shadow-xl border-2 border-white pointer-events-auto flex items-center gap-1 font-medium">
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.828-2.828z" />
+          </svg>
+          <span>Editar</span>
         </div>
       </div>
     </div>

@@ -266,7 +266,11 @@ export default function AdminDashboardPreview() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div
+      className={`min-h-screen bg-gray-50 flex flex-col transition-all duration-300 ${
+        editingContent ? "ml-96" : ""
+      }`}
+    >
       {/* Header */}
       <header className="bg-white shadow-sm border-b flex-shrink-0">
         <div className="px-4 sm:px-6 lg:px-8">
@@ -321,14 +325,14 @@ export default function AdminDashboardPreview() {
               )}
 
               <span className="text-sm text-gray-600">Olá, {user?.name}</span>
-              
-              <a 
+
+              <a
                 href="/admin/dashboard"
                 className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
               >
                 🏠 Dashboard
               </a>
-              
+
               <button
                 onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
@@ -341,9 +345,11 @@ export default function AdminDashboardPreview() {
       </header>
 
       {/* Main Content */}
-      <div className={`flex-1 flex overflow-hidden transition-all duration-300 ${
-        editingContent ? 'ml-96' : 'ml-0'
-      }`}>
+      <div
+        className={`flex-1 flex overflow-hidden transition-all duration-300 ${
+          editingContent ? "ml-96" : "ml-0"
+        }`}
+      >
         {/* Admin Panel */}
         <div
           className={`${
@@ -598,25 +604,25 @@ export default function AdminDashboardPreview() {
 
         {/* Preview Panel */}
         {showPreview && (
-          <div className="w-1/2 bg-gray-100 flex flex-col">
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-3 text-sm flex items-center justify-between">
+          <div className="w-1/2 bg-white flex flex-col">
+            <div className="bg-gray-800 text-white px-4 py-3 text-sm flex items-center justify-between border-b border-gray-300">
               <div className="flex items-center space-x-3">
                 <span className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                   <span>🔄 Preview Ao Vivo</span>
                 </span>
-                <span className="text-xs bg-white/20 px-2 py-1 rounded">
+                <span className="text-xs bg-gray-700 text-gray-200 px-2 py-1 rounded">
                   Clique nos elementos para editar
                 </span>
               </div>
               <button
                 onClick={refreshPreview}
-                className="text-white hover:text-gray-300 text-xs px-3 py-1 rounded bg-white/20 hover:bg-white/30 transition-colors"
+                className="text-white hover:text-gray-300 text-xs px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 transition-colors"
               >
                 🔄 Atualizar
               </button>
             </div>
-            <div className="flex-1 flex items-center justify-center p-4">
+            <div className="flex-1 flex items-center justify-center p-4 bg-white">
               <div
                 className="bg-white rounded-lg shadow-xl overflow-hidden border-2 border-gray-200"
                 style={getPreviewDimensions()}
@@ -624,7 +630,7 @@ export default function AdminDashboardPreview() {
                 <iframe
                   ref={previewRef}
                   src="/"
-                  className="w-full h-full border-0"
+                  className="w-full h-full border-0 bg-white"
                   title="Preview do Site"
                 />
               </div>
@@ -638,10 +644,12 @@ export default function AdminDashboardPreview() {
       {editingContent && (
         <div className="fixed inset-y-0 left-0 w-96 bg-white shadow-2xl z-50 border-r border-gray-200">
           <div className="flex flex-col h-full">
-            <div className="px-6 py-4 border-b border-gray-200 bg-purple-50">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium text-gray-900">
-                  {editingContent.id ? "✏️ Editar Conteúdo" : "➕ Novo Conteúdo"}
+                  {editingContent.id
+                    ? "✏️ Editar Conteúdo"
+                    : "➕ Novo Conteúdo"}
                 </h3>
                 <button
                   onClick={() => setEditingContent(null)}
@@ -673,7 +681,7 @@ export default function AdminDashboardPreview() {
                         section: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
                     placeholder="ex: hero, about, services"
                     required
                   />
@@ -692,7 +700,7 @@ export default function AdminDashboardPreview() {
                         field: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
                     placeholder="ex: title, description"
                     required
                   />
@@ -711,7 +719,7 @@ export default function AdminDashboardPreview() {
                       })
                     }
                     rows={10}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500 text-sm"
                     placeholder="Digite o conteúdo aqui..."
                     required
                   />
@@ -730,7 +738,7 @@ export default function AdminDashboardPreview() {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
                     💾 Salvar
                   </button>
@@ -739,13 +747,6 @@ export default function AdminDashboardPreview() {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Overlay sutil para indicar modo de edição */}
-      {editingContent && (
-        <div 
-          className="fixed inset-0 bg-purple-900 bg-opacity-5 z-40 pointer-events-none"
-        />
       )}
 
       {/* Toast Container */}
